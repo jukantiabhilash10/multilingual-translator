@@ -9,3 +9,5 @@ indic-transliteration==1.1.0
 PyPDF2==1.26.0
 python-dotenv==0.19.2
 gunicorn==20.1.0
+setuptools>=65.0.0
+wheel
