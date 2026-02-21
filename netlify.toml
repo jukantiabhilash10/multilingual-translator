@@ -1,0 +1,11 @@
+[build]
+  command = "echo 'No build needed for static site'"
+  publish = "."
+
+[[redirects]]
+  from = "/api/*"
+  to = "/.netlify/functions/:splat"
+  status = 200
+
+[context.production]
+  environment = { REACT_APP_API_URL = "https://yourdomain.netlify.app" }
