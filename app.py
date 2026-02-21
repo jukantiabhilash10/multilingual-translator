@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify, session, render_template, send_file
+from flask import Flask, request, jsonify, session, send_file
 from flask_cors import CORS
 from pymongo import MongoClient
 from pymongo.errors import ConnectionFailure
@@ -11,15 +11,25 @@ from dotenv import load_dotenv
 # Load environment variables
 load_dotenv()
 
-app = Flask(__name__, template_folder='templates', static_folder='static')
+app = Flask(__name__)
 
-# SECRET KEY (must be set in Render environment variables)
+# SECRET KEY (Set in Render Environment Variables)
 app.config['SECRET_KEY'] = os.getenv('SECRET_KEY')
 
-# Enable CORS
-CORS(app)
+# Required for cross-domain sessions (Netlify → Render)
+app.config.update(
+    SESSION_COOKIE_SECURE=True,
+    SESSION_COOKIE_SAMESITE="None"
+)
 
-# MongoDB connection
+# CORS Configuration (Allow only your Netlify frontend)
+CORS(
+    app,
+    supports_credentials=True,
+    origins=["https://translator-abhi.netlify.app"]
+)
+
+# MongoDB Connection
 mongo_uri = os.getenv('MONGO_URI')
 db = None
 history_collection = None
@@ -44,18 +54,13 @@ def before_request():
     if 'user_id' not in session:
         session['user_id'] = str(request.remote_addr)
 
+# -----------------------------
+# API ROUTES
+# -----------------------------
+
 @app.route('/')
-def index():
-    languages = ['English', 'Telugu', 'Spanish', 'French', 'Hindi', 'Kannada', 'Tamil', 'Marathi']
-    history = []
-
-    if history_collection:
-        try:
-            history = list(history_collection.find({'user_id': session['user_id']}).limit(10))
-        except:
-            history = []
-
-    return render_template('index.html', languages=languages, history=history)
+def home():
+    return jsonify({"message": "Translator API running successfully"})
 
 @app.route('/translate', methods=['POST'])
 def translate():
@@ -70,6 +75,7 @@ def translate():
         ).translate(text)
 
         user_id = session.get('user_id', 'guest')
+
         entry = {
             'user_id': user_id,
             'text': text,
@@ -91,6 +97,7 @@ def translate():
     except Exception as e:
         return jsonify({'error': str(e)}), 400
 
+
 @app.route('/history', methods=['GET'])
 def get_history():
     user_id = session.get('user_id', 'guest')
@@ -109,6 +116,7 @@ def get_history():
 
     return jsonify(history)
 
+
 @app.route('/import_txt', methods=['POST'])
 def import_txt():
     file = request.files.get('file')
@@ -120,6 +128,7 @@ def import_txt():
         return jsonify({'text': content})
     except Exception as e:
         return jsonify({'error': str(e)}), 400
+
 
 @app.route('/download_translated_pdf', methods=['POST'])
 def download_translated_pdf():
@@ -135,12 +144,16 @@ def download_translated_pdf():
         file_path = '/tmp/translation.pdf'
         pdf.output(file_path)
 
-        return send_file(file_path,
-                         mimetype='application/pdf',
-                         as_attachment=True,
-                         download_name='translation.pdf')
+        return send_file(
+            file_path,
+            mimetype='application/pdf',
+            as_attachment=True,
+            download_name='translation.pdf'
+        )
+
     except Exception as e:
         return jsonify({'error': str(e)}), 400
+
 
 @app.route('/download_history_pdf', methods=['GET'])
 def download_history_pdf():
@@ -157,7 +170,7 @@ def download_history_pdf():
         pdf = CustomPDF()
         pdf.add_page()
         pdf.set_font("Arial", size=10)
-        pdf.multi_cell(0, 8, f"Translation History for {user_id}\n\n")
+        pdf.multi_cell(0, 8, f"Translation History\n\n")
 
         for entry in history:
             text = (
@@ -171,12 +184,16 @@ def download_history_pdf():
         file_path = '/tmp/history.pdf'
         pdf.output(file_path)
 
-        return send_file(file_path,
-                         mimetype='application/pdf',
-                         as_attachment=True,
-                         download_name='history.pdf')
+        return send_file(
+            file_path,
+            mimetype='application/pdf',
+            as_attachment=True,
+            download_name='history.pdf'
+        )
+
     except Exception as e:
         return jsonify({'error': str(e)}), 400
+
 
 @app.route('/speak', methods=['POST'])
 def speak():
@@ -188,6 +205,7 @@ def speak():
         return send_file(audio_file, mimetype='audio/mpeg')
     except Exception as e:
         return jsonify({'error': str(e)}), 400
+
 
 @app.route('/health', methods=['GET'])
 def health():
