@@ -1,7 +1,7 @@
 // This file contains client-side JavaScript code that handles user interactions, AJAX requests to the server for translation and transliteration, and manages local storage for user preferences.
 
 // API Base URL - configure for your backend deployment
-const API_BASE_URL = window.location.hostname === 'localhost' ? 'http://localhost:5000' : 'https://translator-api-xyz.onrender.com';
+const API_BASE_URL = window.location.hostname === 'localhost' ? 'http://localhost:5000' : 'https://translator-api-0th4.onrender.com';
 
 $(document).ready(function() {
     // Load available languages and translation history on page load
