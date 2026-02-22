@@ -12,3 +12,4 @@ PyPDF2==1.26.0
 python-dotenv==1.0.0
 gunicorn==22.0.0
 setuptools==70.0.0
+authlib
