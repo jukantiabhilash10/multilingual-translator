@@ -3,7 +3,10 @@ import os
 import uuid
 from deep_translator import GoogleTranslator
 from gtts import gTTS
-from PyPDF2 import PdfReader
+try:
+    from PyPDF2 import PdfReader
+except ImportError:
+    from PyPDF2 import PdfFileReader as PdfReader
 import speech_recognition as sr
 from pymongo import MongoClient
 from datetime import datetime, timedelta
