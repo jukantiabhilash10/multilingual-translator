@@ -1,0 +1,2242 @@
+<!DOCTYPE html>
+<html lang="en">
+   <head>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>Voiceprint Translator</title>
+      <link rel="stylesheet"
+         href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+      <link rel="stylesheet" href="/static/css/style.css">
+      <link rel="icon" type="image/png"
+         href="https://cdn-icons-png.flaticon.com/512/2921/2921222.png">
+    
+      <style>
+        /* Dark Mode Styles */
+        :root {
+            --bg-gradient-light: linear-gradient(135deg, #e0e7ff 0%, #f0f4f8 50%, #c7d2fe 100%);
+            --bg-gradient-dark: linear-gradient(135deg, #232946 0%, #16161a 100%);
+            --text-color-light: #2d3a8c;
+            --text-color-dark: #eaeaea;
+            --border-color-light: #a5b4fc;
+            --border-color-dark: #35377a;
+        }
+
+        body {
+            transition: background 0.3s ease, color 0.3s ease;
+            background: var(--bg-gradient-light);
+            color: var(--text-color-light);
+        }
+
+        body.dark-mode {
+            background: var(--bg-gradient-dark) !important;
+            color: var(--text-color-dark) !important;
+        }
+
+        /* Dark mode specific styles */
+        .dark-mode #translatorApp {
+            background: linear-gradient(135deg, rgba(35, 41, 70, 0.95) 0%, rgba(22, 22, 26, 0.95) 100%) !important;
+            box-shadow: 0 12px 40px rgba(20,20,40,0.28), 0 1.5px 8px rgba(99,102,241,0.12) !important;
+        }
+
+        .dark-mode textarea.form-control,
+        .dark-mode select.form-control,
+        .dark-mode input.form-control {
+            background-color: rgba(30, 41, 59, 0.92) !important;
+            color: var(--text-color-dark) !important;
+            border: 1.5px solid var(--border-color-dark) !important;
+        }
+
+        .dark-mode .btn {
+            background: linear-gradient(90deg, #6366f1 0%, #818cf8 100%) !important;
+            color: #fff !important;
+        }
+
+        .dark-mode #sidebar-history {
+            background: linear-gradient(135deg, rgba(35, 41, 70, 0.95) 0%, rgba(22, 22, 26, 0.95) 100%) !important;
+        }
+
+        .dark-mode .list-group-item {
+            background: rgba(44, 62, 80, 0.7) !important;
+            color: var(--text-color-dark) !important;
+            border: 1px solid var(--border-color-dark) !important;
+        }
+
+        /* Dark Mode Toggle Button Styles */
+        #darkModeToggle {
+            position: fixed;
+            right: 20px;
+            top: 20px;
+            z-index: 2000;
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255,255,255,0.85);
+            box-shadow: 0 2px 8px rgba(44,62,80,0.15);
+            border: 1.5px solid var(--border-color-light);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .dark-mode #darkModeToggle {
+            background: rgba(44,62,80,0.92) !important;
+            color: #fff !important;
+            border: 1.5px solid #6366f1 !important;
+        }
+
+        #darkModeToggle:hover {
+            transform: scale(1.1);
+            box-shadow: 0 4px 12px rgba(99,102,241,0.25);
+        }
+      </style>
+      <style>
+         /* Modern gradient background for the whole page */
+         body {
+         min-height: 100vh;
+         background: linear-gradient(135deg, #e0e7ff 0%, #f0f4f8 50%, #c7d2fe 100%);
+         font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+         }
+         
+         /* Splash Screen Styles */
+         #splashScreen {
+             position: fixed;
+             top: 0;
+             left: 0;
+             width: 100vw;
+             height: 100vh;
+             color: white;
+             display: flex;
+             justify-content: center;
+             align-items: center;
+             z-index: 9999;
+             padding: 20px;
+             overflow-y: auto;
+             background: linear-gradient(135deg, #6366f1 0%, #818cf8 50%, #f472b6 100%);
+             transition: background 0.3s ease;
+         }
+
+         /* Dark mode splash screen */
+         body.dark-mode #splashScreen {
+             background: linear-gradient(135deg, #232946 0%, #2a2a4a 50%, #16161a 100%);
+         }
+
+         /* Dark mode splash content */
+         body.dark-mode .splash-content {
+             background: rgba(0, 0, 0, 0.2);
+         }
+
+         body.dark-mode .feature-slide {
+             background: rgba(0, 0, 0, 0.3);
+         }
+
+         body.dark-mode .quick-start-guide {
+             background: rgba(0, 0, 0, 0.3);
+         }
+
+         body.dark-mode .step {
+             background: rgba(0, 0, 0, 0.2);
+         }
+
+         /* Dark mode button */
+         .splash-dark-toggle {
+             position: fixed;
+             right: 20px;
+             top: 20px;
+             z-index: 10000;
+             width: 44px;
+             height: 44px;
+             border-radius: 50%;
+             display: flex;
+             align-items: center;
+             justify-content: center;
+             background: rgba(255, 255, 255, 0.15);
+             border: 2px solid rgba(255, 255, 255, 0.2);
+             color: white;
+             font-size: 1.2rem;
+             cursor: pointer;
+             transition: all 0.3s ease;
+         }
+
+         .splash-dark-toggle:hover {
+             background: rgba(255, 255, 255, 0.25);
+             transform: scale(1.05);
+         }
+
+         body.dark-mode .splash-dark-toggle {
+             background: rgba(0, 0, 0, 0.3);
+             border-color: rgba(255, 255, 255, 0.1);
+         }
+
+         .splash-content {
+             max-width: 1000px;
+             text-align: center;
+             padding: 20px;
+             background: rgba(255, 255, 255, 0.1);
+             border-radius: 24px;
+             backdrop-filter: blur(10px);
+             box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+         }
+
+         .splash-icon {
+             width: 120px;
+             height: 120px;
+             margin-bottom: 24px;
+             border-radius: 24px;
+             box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+             animation: float 3s ease-in-out infinite;
+         }
+
+         .splash-title {
+             font-size: 2.8rem;
+             font-weight: 900;
+             margin-bottom: 40px;
+             text-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+             letter-spacing: 2px;
+             background: linear-gradient(90deg, #fff, #e0e7ff);
+             -webkit-background-clip: text;
+             -webkit-text-fill-color: transparent;
+         }
+
+         /* Features Carousel */
+         .features-carousel {
+             display: flex;
+             justify-content: center;
+             flex-wrap: wrap;
+             gap: 24px;
+             margin-bottom: 40px;
+         }
+
+         .feature-slide {
+             background: rgba(255, 255, 255, 0.15);
+             padding: 24px;
+             border-radius: 16px;
+             width: 280px;
+             text-align: center;
+             transition: transform 0.3s ease;
+         }
+
+         .feature-slide:hover {
+             transform: translateY(-5px);
+             background: rgba(255, 255, 255, 0.2);
+         }
+
+         .feature-slide i {
+             font-size: 2.5rem;
+             margin-bottom: 16px;
+             color: #fff;
+         }
+
+         .feature-slide h3 {
+             font-size: 1.4rem;
+             margin-bottom: 12px;
+             color: #fff;
+         }
+
+         .feature-slide p {
+             font-size: 1rem;
+             color: rgba(255, 255, 255, 0.9);
+             line-height: 1.5;
+         }
+
+         /* Quick Start Guide */
+         .quick-start-guide {
+             background: rgba(255, 255, 255, 0.15);
+             padding: 32px;
+             border-radius: 16px;
+             margin: 40px 0;
+         }
+
+         .quick-start-guide h3 {
+             color: #fff;
+             font-size: 1.8rem;
+             margin-bottom: 24px;
+             text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+         }
+
+         .steps-container {
+             display: flex;
+             justify-content: center;
+             flex-wrap: wrap;
+             gap: 24px;
+         }
+
+         .step {
+             display: flex;
+             align-items: center;
+             gap: 16px;
+             background: rgba(255, 255, 255, 0.1);
+             padding: 16px 24px;
+             border-radius: 12px;
+             min-width: 250px;
+         }
+
+         .step-number {
+             background: #fff;
+             color: #6366f1;
+             width: 32px;
+             height: 32px;
+             border-radius: 50%;
+             display: flex;
+             align-items: center;
+             justify-content: center;
+             font-weight: bold;
+             font-size: 1.2rem;
+         }
+
+         .step p {
+             margin: 0;
+             color: #fff;
+             font-size: 1.1rem;
+         }
+
+         #getStartedBtn {
+             background: #fff;
+             color: #6366f1;
+             font-size: 1.3rem;
+             padding: 12px 40px;
+             border-radius: 50px;
+             border: none;
+             font-weight: 700;
+             margin-top: 32px;
+             transition: all 0.3s ease;
+             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+         }
+
+         #getStartedBtn:hover {
+             transform: scale(1.05);
+             box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+             background: #e0e7ff;
+         }
+
+         /* Authentication Links Styles */
+         .splash-content .btn-outline-light {
+             color: #fff;
+             border: 2px solid #fff;
+             font-size: 1rem;
+             padding: 8px 24px;
+             border-radius: 25px;
+             font-weight: 600;
+             transition: all 0.3s ease;
+         }
+
+         .splash-content .btn-outline-light:hover {
+             background: #fff;
+             color: #6366f1;
+             transform: translateY(-2px);
+             box-shadow: 0 4px 12px rgba(255, 255, 255, 0.3);
+         }
+
+         /* Navbar Styles */
+         #authNavbar {
+             box-shadow: 0 2px 8px rgba(99, 102, 241, 0.15);
+         }
+
+         #authNavbar.dark-mode {
+             background: rgba(35, 41, 70, 0.95) !important;
+             border-bottom: 2px solid #6366f1 !important;
+         }
+
+         #authNavbar .btn-outline-danger {
+             border-color: #ec4899;
+             color: #ec4899;
+             font-weight: 600;
+             transition: all 0.3s ease;
+         }
+
+         #authNavbar .btn-outline-danger:hover {
+             background: #ec4899;
+             color: #fff;
+         }
+
+         #usernameDisplay {
+             font-size: 1.1rem;
+         }
+
+         @keyframes float {
+             0% { transform: translateY(0px); }
+             50% { transform: translateY(-10px); }
+             100% { transform: translateY(0px); }
+         }
+
+         /* Responsive Design */
+         @media (max-width: 768px) {
+             .splash-title {
+                 font-size: 2rem;
+             }
+             
+             .feature-slide {
+                 width: 100%;
+                 max-width: 320px;
+             }
+             
+             .step {
+                 width: 100%;
+             }
+         }
+          /* Glassmorphism card for translator */
+         #translatorApp {
+         background: linear-gradient(135deg, rgba(99,102,241,0.18)
+         0%, rgba(236,72,153,0.10) 100%), rgba(255,255,255,0.10);
+         box-shadow: 0 16px 48px 0 rgba(44,62,80,0.22), 0 2px 12px
+         0 rgba(99,102,241,0.10), inset 0 1.5px 16px 0 rgba(99,102,241,0.08);
+         backdrop-filter: blur(32px) saturate(1.2);
+         border-radius: 0;
+         border: none;
+         padding: 0 32px 40px 32px;
+         margin-top: 0;
+         max-width: calc(100% - 300px) !important;
+         min-width: 0 !important;
+         width: 80vw !important;
+         height: auto !important;
+         min-height: auto !important;
+         max-height: none !important;
+         overflow-y: auto;
+         margin-left: 0;
+         margin-right: 0;
+         transition: box-shadow 0.3s, background 0.3s;
+         display: flex;
+         flex-direction: column;
+         align-items: center;
+         float: right;
+         flex: 1;
+         margin: 0 auto;
+         }
+         #translatorApp h1 {
+         color: #4f46e5;
+         font-weight: 900;
+         letter-spacing: 2px;
+         margin-bottom: 36px;
+         font-size: 2.8rem;
+         text-shadow: 0 4px 24px #c7d2fe, 0 1.5px 8px #818cf8;
+         }
+         .form-control, .btn {
+         background-color: rgba(255,255,255,0.85);
+         color: #3730a3;
+         border: 1.5px solid #a5b4fc;
+         border-radius: 16px;
+         box-shadow: 0 2px 16px rgba(99,102,241,0.08);
+         font-size: 1.15rem;
+         transition: box-shadow 0.2s, background 0.2s, color 0.2s,
+         border 0.2s;
+         }
+         .form-control:focus {
+         box-shadow: 0 0 0 3px #818cf8;
+         border-color: #6366f1;
+         }
+         .form-control::placeholder {
+         color: #a5b4fc;
+         }
+         .btn {
+         font-weight: 700;
+         background: linear-gradient(90deg, #6366f1 0%, #a5b4fc 100%);
+         color: #fff;
+         border: none;
+         box-shadow: 0 2px 12px rgba(99,102,241,0.10);
+         border-radius: 16px;
+         }
+         .btn:hover, .btn:focus {
+         background: linear-gradient(90deg, #818cf8 0%, #f472b6 100%);
+         color: #fff;
+         box-shadow: 0 6px 24px rgba(99,102,241,0.18);
+         }
+         .btn-warning, .btn-danger, .btn-info, .btn-success,
+         .btn-secondary, .btn-primary {
+         background: linear-gradient(90deg, #6366f1 0%, #a5b4fc
+         100%) !important;
+         color: #fff !important;
+         }
+         .btn-warning:hover, .btn-danger:hover, .btn-info:hover,
+         .btn-success:hover, .btn-secondary:hover, .btn-primary:hover {
+         background: linear-gradient(90deg, #818cf8 0%, #f472b6
+         100%) !important;
+         }
+         textarea.form-control {
+         min-height: 160px;
+         resize: none;
+         font-size: 1.22rem;
+         border-radius: 20px;
+         background: rgba(255,255,255,0.92);
+         box-shadow: 0 2px 12px rgba(99,102,241,0.06);
+         }
+         .input-group-append .btn {
+         background: linear-gradient(90deg, #f472b6 0%, #6366f1 100%);
+         color: #fff;
+         border-radius: 50%;
+         width: 56px;
+         height: 56px;
+         display: flex;
+         align-items: center;
+         justify-content: center;
+         font-size: 2.2rem;
+         box-shadow: 0 2px 12px rgba(99,102,241,0.10);
+         }
+         .input-group-append .btn:hover {
+         background: linear-gradient(90deg, #f9a8d4 0%, #818cf8 100%);
+         }
+         /* Splash Screen Styling */
+         #splashScreen {
+         position: fixed;
+         top: 0;
+         left: 0;
+         width: 100vw;
+         height: 100vh;
+         background: linear-gradient(120deg, #6366f1 0%, #f472b6 100%);
+         color: white;
+         display: flex;
+         flex-direction: column;
+         justify-content: center;
+         align-items: center;
+         z-index: 9999;
+         text-align: center;
+         animation: fadeIn 1.2s;
+         }
+         #splashScreen h1 {
+         font-size: 2.7rem;
+         margin-bottom: 20px;
+         text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.25);
+         font-weight: 900;
+         }
+         #splashScreen img {
+         width: 120px;
+         height: 120px;
+         margin-bottom: 18px;
+         border-radius: 24px;
+         box-shadow: 0 4px 24px rgba(0,0,0,0.18);
+         }
+         #getStartedBtn {
+         margin-top: 18px;
+         font-size: 1.3rem;
+         padding: 10px 36px;
+         border-radius: 18px;
+         background: linear-gradient(90deg, #f472b6 0%, #6366f1 100%);
+         color: #fff;
+         border: none;
+         font-weight: 700;
+         box-shadow: 0 2px 8px rgba(44,62,80,0.10);
+         transition: background 0.2s, box-shadow 0.2s;
+         }
+         #getStartedBtn:hover {
+         background: linear-gradient(90deg, #f9a8d4 0%, #818cf8 100%);
+         box-shadow: 0 4px 16px rgba(44,62,80,0.18);
+         }
+         /* Created By badge */
+         #createdBy {
+         position: fixed;
+         bottom: 20px;
+         right: 20px;
+         color: #f0f0f0;
+         font-size: 1.2rem;
+         font-weight: 700;
+         text-shadow: 2px 2px 6px rgba(0,0,0,0.8);
+         background: rgba(30, 41, 59, 0.7);
+         padding: 8px 18px;
+         border-radius: 16px;
+         font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+         z-index: 10000;
+         user-select: none;
+         transition: all 0.3s ease;
+         border: 1.5px solid #818cf8;
+         letter-spacing: 0.5px;
+         }
+         #createdBy:hover {
+         background: rgba(99,102,241,0.95);
+         color: #fff;
+         text-shadow: 2px 2px 8px rgba(0,198,255,0.9);
+         cursor: pointer;
+         }
+         /* Translation History Section */
+         #translation-history-container {
+         background: rgba(255,255,255,0.8);
+         border-radius: 18px;
+         box-shadow: 0 2px 12px rgba(44,62,80,0.10);
+         padding: 24px 18px;
+         max-width: 900px;
+         margin: 32px auto 0 auto;
+         }
+         #translation-history-container h2 {
+         color: #2d3a8c;
+         font-weight: 800;
+         margin-bottom: 18px;
+         }
+         #translation-history-list {
+         background: transparent;
+         }
+         #translation-history-list .list-group-item {
+         background: rgba(236, 239, 255, 0.7);
+         border-radius: 10px;
+         margin-bottom: 8px;
+         border: none;
+         color: #2d3a8c;
+         font-size: 1.08rem;
+         }
+         #toggle-history-btn {
+         display: block;
+         margin: 32px auto 0 auto;
+         font-size: 1.1rem;
+         border-radius: 12px;
+         padding: 8px 28px;
+         background: linear-gradient(90deg, #6366f1 0%, #60a5fa 100%);
+         color: #fff;
+         border: none;
+         font-weight: 700;
+         box-shadow: 0 2px 8px rgba(44,62,80,0.10);
+         }
+         #toggle-history-btn:hover {
+         background: linear-gradient(90deg, #818cf8 0%, #38bdf8 100%);
+         }
+         /* Responsive tweaks */
+         @media (max-width: 900px) {
+         #translatorApp, #translation-history-container {
+         padding: 18px 6px;
+         }
+         }
+         @media (max-width: 600px) {
+         #translatorApp, #translation-history-container {
+         padding: 8px 2px;
+         border-radius: 10px;
+         }
+         #createdBy {
+         font-size: 1rem;
+         padding: 6px 10px;
+         border-radius: 10px;
+         }
+         }
+         @keyframes fadeIn {
+         from { opacity: 0; }
+         to { opacity: 1; }
+         }
+         /* Ensure file input and buttons are stacked and aligned */
+         .form-control-file {
+         width: 100% !important;
+         max-width: none !important;
+         overflow: visible !important;
+         white-space: nowrap !important;
+         text-overflow: ellipsis !important;
+         padding: 8px !important;
+         border: 1.5px solid #a5b4fc !important;
+         border-radius: 8px !important;
+         background: #f8fafc !important;
+         color: #2d3a8c !important;
+         font-size: 1rem !important;
+         }
+         .btn-block, .flex-fill {
+         min-width: 180px;
+         width: 100%;
+         }
+         .gap-2 {
+         gap: 10px !important;
+         }
+         @media (max-width: 767px) {
+         .d-flex.flex-wrap.gap-2.w-100 {
+         flex-direction: column;
+         }
+         .btn-block, .flex-fill {
+         min-width: unset;
+         }
+         }
+         /* Remove extra margin from the last button */
+         #translatorApp .btn-block:last-child {
+         margin-bottom: 0;
+         }
+         /* Side-by-side layout for import and action buttons */
+         .form-control-file {
+         width: 100%;
+         margin-bottom: 8px;
+         }
+         .btn-block, .flex-fill {
+         min-width: 180px;
+         width: 100%;
+         }
+         .mr-2 {
+         margin-right: 10px !important;
+         }
+         .mb-2 {
+         margin-bottom: 10px !important;
+         }
+         .d-flex.flex-wrap.w-100 {
+         gap: 0;
+         }
+         @media (max-width: 767px) {
+         .row.mt-4 > div {
+         margin-bottom: 18px;
+         }
+         .d-flex.flex-wrap.w-100 {
+         flex-direction: column;
+         }
+         .btn-block, .flex-fill {
+         min-width: unset;
+         }
+         }
+         /* Side-by-side for each pair, responsive */
+         .form-control-file {
+         width: 100%;
+         margin-bottom: 0;
+         }
+         .d-flex > .form-control-file {
+         max-width: 50%;
+         }
+         .d-flex > .btn {
+         min-width: 0;
+         }
+         .d-flex > .mr-2 {
+         margin-right: 10px !important;
+         }
+         .mb-2 {
+         margin-bottom: 10px !important;
+         }
+         @media (max-width: 767px) {
+         .d-flex {
+         flex-direction: column !important;
+         }
+         .d-flex > .form-control-file {
+         max-width: 100%;
+         margin-bottom: 8px;
+         }
+         .d-flex > .btn {
+         width: 100%;
+         }
+         }
+         /* Beautiful card and side-by-side layout for import/action area */
+         .card {
+         background: rgba(255,255,255,0.92) !important;
+         border-radius: 18px !important;
+         box-shadow: 0 4px 24px rgba(44,62,80,0.10) !important;
+         }
+         .gap-3 > * + * {
+         margin-top: 1.2rem !important;
+         }
+         .border-md-right {
+         border-right: 1.5px solid #e0e7ff;
+         }
+         @media (max-width: 991px) {
+         .border-md-right {
+         border-right: none;
+         border-bottom: 1.5px solid #e0e7ff;
+         padding-bottom: 1.5rem;
+         margin-bottom: 1.5rem;
+         }
+         .pl-md-3, .pr-md-3 {
+         padding-left: 0 !important;
+         padding-right: 0 !important;
+         }
+         }
+         @media (max-width: 767px) {
+         .card {
+         padding: 1rem !important;
+         }
+         .gap-3 > * + * {
+         margin-top: 0.7rem !important;
+         }
+         .d-flex {
+         flex-direction: column !important;
+         }
+         .d-flex > .form-control-file {
+         max-width: 100%;
+         margin-bottom: 8px;
+         }
+         .d-flex > .btn {
+         width: 100%;
+         }
+         .mb-3 {
+         margin-bottom: 0.7rem !important;
+         }
+         }
+         .file-input-large {
+         min-width: 320px;
+         font-size: 1.12rem;
+         padding: 10px 16px;
+         background: #f8fafc;
+         border-radius: 8px;
+         border: 1.5px solid #b6b6b6;
+         color: #2d3a8c;
+         transition: border 0.2s, box-shadow 0.2s;
+         }
+         .file-input-large:focus {
+         border: 1.5px solid #6366f1;
+         box-shadow: 0 0 0 2px #a5b4fc;
+         }
+         @media (max-width: 991px) {
+         .file-input-large {
+         min-width: 200px;
+         }
+         }
+         @media (max-width: 767px) {
+         .file-input-large {
+         min-width: unset;
+         width: 100%;
+         }
+         }
+         .d-flex.align-items-center.mb-3, .d-flex.align-items-center {
+         background: #f4f7ff;
+         border-radius: 10px;
+         padding: 10px 12px;
+         box-shadow: 0 2px 8px rgba(44,62,80,0.06);
+         margin-bottom: 18px !important;
+         min-height: 54px;
+         }
+         .file-input-large {
+         min-width: 320px;
+         font-size: 1.12rem;
+         padding: 10px 16px;
+         background: #f8fafc;
+         border-radius: 8px;
+         border: 1.5px solid #b6b6b6;
+         color: #2d3a8c;
+         transition: border 0.2s, box-shadow 0.2s;
+         margin-right: 12px;
+         flex-shrink: 0;
+         }
+         #pdfFileInput, #txtFileInput {
+         display: inline-block;
+         vertical-align: middle;
+         }
+         @media (max-width: 991px) {
+         .file-input-le {
+         min-width: 200px;
+         }
+         }
+         @media (max-width: 767px) {
+         .file-input-small {
+         min-width: unset;
+         width: 100%;
+         margin-right: 0;
+         }
+         .d-flex.align-items-center.mb-3, .d-flex.align-items-center {
+         flex-direction: column !important;
+         align-items: stretch !important;
+         padding: 8px 4px;
+         }
+         }
+         .file-input-large {
+         min-width: 220px;
+         font-size: 1.12rem;
+         padding: 10px 16px;
+         background: #f8fafc;
+         border-radius: 8px;
+         border: 1.5px solid #b6b6b6;
+         color: #2d3a8c;
+         transition: border 0.2s, box-shadow 0.2s;
+         margin-right: 0;
+         flex-shrink: 1;
+         }
+         .ml-md-2 {
+         margin-left: 12px !important;
+         }
+         @media (max-width: 900px) {
+         .file-input-small {
+         min-width: 140px;
+         }
+         }
+         @media (max-width: 700px) {
+         .file-input-small {
+         min-width: unset;
+         width: 100%;
+         }
+         .ml-md-2 {
+         margin-left: 0 !important;
+         }
+         }
+         @media (max-width: 767px) {
+         .d-flex.mb-3.w-100 {
+         flex-direction: column !important;
+         gap: 10px !important;
+         }
+         .btn.w-75 {
+         width: 100% !important;
+         }
+         }
+         @media (max-width: 1300px) {
+         #translatorApp { max-width: 100vw !important; min-width: 0
+         !important; height: 100vh !important; }
+         }
+         @media (max-width: 1000px) {
+         #translatorApp { min-width: 0 !important; height: 100vh
+         !important; }
+         }
+         @media (max-width: 1200px) {
+         #translatorApp { min-width: 0 !important; height: 100vh
+         !important; }
+         }
+         @media (max-width: 900px) {
+         #translatorApp { min-width: 0 !important; padding: 18px
+         6px; height: 100vh !important; }
+         .row.mt-4 { flex-direction: column; }
+         }
+         @media (max-width: 700px) {
+         #translatorApp { min-width: 0 !important; padding: 8px
+         2px; border-radius: 10px; height: 100vh !important; }
+         .row.mt-4 { flex-direction: column; }
+         }
+         .row.mt-4 {
+         width: 100%;
+         }
+         .col-md-6, .col-md-4 {
+         display: flex;
+         flex-direction: column;
+         align-items: center;
+         }
+         label[for="langFrom"], label[for="langTo"] {
+         display: block;
+         width: 100%;
+         font-weight: 600;
+         font-size: 1.1rem;
+         margin-bottom: 6px;
+         color: #2d3a8c;
+         }
+         select.form-control {
+         width: 100%;
+         min-width: 220px;
+         max-width: 100%;
+         font-size: 1.08rem;
+         margin-bottom: 18px;
+         background: #f4f7ff;
+         border-radius: 10px;
+         border: 1.5px solid #b6b6b6;
+         color: #2d3a8c;
+         }
+         @media (max-width: 1200px) {
+         #translatorApp { min-width: 90vw !important; }
+         }
+         @media (max-width: 900px) {
+         #translatorApp { min-width: 98vw !important; padding: 18px 6px; }
+         .row.mt-4 { flex-direction: column; }
+         }
+         @media (max-width: 700px) {
+         #translatorApp { min-width: unset !important; padding: 8px
+         2px; border-radius: 10px; }
+         .row.mt-4 { flex-direction: column; }
+         }
+         /* Add a subtle border and shadow to the input/output areas */
+         .input-group, .mb-3 {
+         border-radius: 18px;
+         box-shadow: 0 2px 12px rgba(99,102,241,0.06);
+         background: rgba(255,255,255,0.80);
+         border: 1.5px solid #a5b4fc;
+         }
+         /* Add a soft glow to the action buttons */
+         .row.mt-4 button.btn {
+         box-shadow: 0 2px 16px 0 rgba(99,102,241,0.12), 0 1.5px
+         8px 0 rgba(236,72,153,0.08);
+         }
+         /* Make select boxes more modern */
+         select.form-control {
+         background: rgba(244,247,255,0.95);
+         border-radius: 12px;
+         border: 1.5px solid #a5b4fc;
+         color: #3730a3;
+         font-size: 1.12rem;
+         }
+         label[for="langFrom"], label[for="langTo"] {
+         color: #4f46e5;
+         font-weight: 700;
+         font-size: 1.13rem;
+         margin-bottom: 8px;
+         letter-spacing: 0.5px;
+         }
+         /* Responsive tweaks for beauty */
+         @media (max-width: 1200px) {
+         #translatorApp { padding: 24px 8px 16px 8px; }
+         }
+         @media (max-width: 900px) {
+         #translatorApp { padding: 8px 2vw 8px 2vw; border-radius: 18px; }
+         #translatorApp h1 { font-size: 2rem; }
+         }
+         @media (max-width: 700px) {
+         #translatorApp { padding: 2vw 1vw; border-radius: 10px; }
+         #translatorApp h1 { font-size: 1.3rem; }
+         }
+         /* Sidebar history like ChatGPT - Floating */
+         #sidebar-history {
+         position: fixed;
+         left: -280px;
+         top: 0;
+         width: 20vw;
+         min-width: 220px;
+         max-width: 340px;
+         height: 100vh;
+         background: linear-gradient(135deg, #f0f4ff 60%, #e0e7ff 100%);
+         box-shadow: 2px 0 24px rgba(99,102,241,0.15);
+         border-top-right-radius: 0;
+         border-bottom-right-radius: 0;
+         z-index: 1000;
+         padding: 32px 18px 24px 18px;
+         display: flex;
+         flex-direction: column;
+         align-items: flex-start;
+         overflow-y: auto;
+         transition: left 0.3s ease, box-shadow 0.3s ease;
+         }
+         #sidebar-history:hover {
+         left: 0;
+         box-shadow: 4px 0 32px rgba(99,102,241,0.25);
+         }
+         #main-flex-container:hover #sidebar-history {
+         left: 0;
+         }
+         #sidebar-history h2 {
+         color: #4f46e5;
+         font-size: 1.4rem;
+         font-weight: 800;
+         margin-bottom: 18px;
+         }
+         #sidebar-history ul {
+         list-style: none;
+         padding: 0;
+         width: 100%;
+         }
+         #sidebar-history .list-group-item {
+         background: rgba(236, 239, 255, 0.85);
+         border-radius: 10px;
+         margin-bottom: 8px;
+         border: none;
+         color: #2d3a8c;
+         font-size: 1.08rem;
+         padding: 12px 16px;
+         cursor: pointer;
+         transition: background 0.18s, color 0.18s;
+         }
+         #sidebar-history .list-group-item:hover {
+         background: #6366f1;
+         color: #fff;
+         }
+         /* Responsive: hide sidebar on small screens */
+         @media (max-width: 900px) {
+         #sidebar-history {
+         position: static;
+         width: 100vw;
+         max-width: 100vw;
+         min-width: unset;
+         border-radius: 0 0 32px 32px;
+         height: auto;
+         box-shadow: none;
+         flex-direction: row;
+         align-items: flex-start;
+         padding: 12px 4px;
+         }
+         #translatorApp {
+         max-width: 100vw !important;
+         width: 100vw !important;
+         border-radius: 0;
+         margin-left: 0;
+         }
+         }
+         /* Add/override styles for flex layout */
+         #main-flex-container {
+         display: flex;
+         height: 100vh;
+         width: 100vw;
+         overflow: hidden;
+         border: none !important;
+         background: transparent !important;
+         box-shadow: none !important;
+         margin: 0 !important;
+         padding: 0 !important;
+         }
+         @media (max-width: 900px) {
+         #main-flex-container {
+         padding-left: 8px;
+         padding-right: 8px;
+         }
+         }
+         #sidebar-history {
+         flex: 0 0 20vw;
+         min-width: 220px;
+         max-width: 340px;
+         height: 100vh;
+         position: relative;
+         z-index: 1000;
+         background: linear-gradient(135deg, #f0f4ff 60%, #e0e7ff 100%);
+         box-shadow: none;
+         border: none;
+         padding: 36px 20px 28px 20px;
+         display: flex;
+         flex-direction: column;
+         align-items: flex-start;
+         overflow-y: auto;
+         }
+         #sidebar-history h2 {
+         color: #6366f1;
+         font-size: 1.5rem;
+         font-weight: 900;
+         margin-bottom: 22px;
+         letter-spacing: 1px;
+         text-shadow: 0 2px 12px #c7d2fe;
+         }
+         #sidebar-history .list-group-item {
+         background: linear-gradient(90deg, #e0e7ff 0%, #c7d2fe 100%);
+         border-radius: 14px;
+         margin-bottom: 10px;
+         border: none;
+         color: #3730a3;
+         font-size: 1.13rem;
+         padding: 14px 18px;
+         cursor: pointer;
+         font-weight: 600;
+         box-shadow: 0 2px 12px rgba(99,102,241,0.10);
+         transition: background 0.18s, color 0.18s, box-shadow 0.18s;
+         border-left: 4px solid #6366f1;
+         }
+         #sidebar-history .list-group-item:hover {
+         background: linear-gradient(90deg, #6366f1 0%, #818cf8 100%);
+         color: #fff;
+         box-shadow: 0 4px 18px rgba(99,102,241,0.18);
+         }
+         /* #translatorApp {
+         flex: 1 1 0;
+         max-width: calc(100vw - 220px);
+         min-width: 0 !important;
+         width: 100%;
+         height: 100vh !important;
+         margin-left: 32px;
+         margin-right: 16px;
+         float: none;
+         border-radius: 0 36px 36px 0;
+         overflow-y: auto;
+         box-sizing: border-box;
+         background: linear-gradient(135deg, rgba(99,102,241,0.18)
+         0%, rgba(236,72,153,0.13) 100%), rgba(255,255,255,0.13);
+         box-shadow: 0 16px 48px 0 rgba(44,62,80,0.18), 0 2px 12px
+         0 rgba(99,102,241,0.10), inset 0 1.5px 16px 0 rgba(99,102,241,0.08);
+         backdrop-filter: blur(32px) saturate(1.2);
+         border: 2.5px solid rgba(99,102,241,0.18);
+         padding: 56px 40px 44px 40px;
+         display: flex;
+         flex-direction: column;
+         align-items: center;
+         transition: box-shadow 0.3s, background 0.3s, border 0.3s;
+         } */
+         @media (max-width: 900px) {
+         #translatorApp {
+         margin-left: 0;
+         margin-right: 0;
+         }
+         }
+         #translatorApp h1 {
+         color: #6366f1;
+         font-weight: 900;
+         letter-spacing: 2px;
+         margin-bottom: 38px;
+         font-size: 3rem;
+         text-shadow: 0 4px 24px #c7d2fe, 0 1.5px 8px #818cf8;
+         background: linear-gradient(90deg, #6366f1 0%, #f472b6 100%);
+         -webkit-background-clip: text;
+         -webkit-text-fill-color: transparent;
+         background-clip: text;
+         }
+         #translatorApp .row.mt-4 {
+         background: rgba(255,255,255,0.85);
+         border-radius: 24px;
+         box-shadow: 0 2px 16px rgba(99,102,241,0.10);
+         padding: 24px 18px 18px 18px;
+         margin-bottom: 24px;
+         width: 100%;
+         transition: background 0.3s;
+         }
+         #translatorApp .col-md-6, #translatorApp .col-md-4 {
+         background: rgba(236,239,255,0.55);
+         border-radius: 18px;
+         margin: 8px 0;
+         box-shadow: 0 1.5px 8px rgba(99,102,241,0.08);
+         padding: 18px 10px;
+         transition: background 0.3s;
+         }
+         #translatorApp textarea.form-control {
+         background: rgba(255,255,255,0.97);
+         border-radius: 18px;
+         box-shadow: 0 2px 12px rgba(99,102,241,0.06);
+         font-size: 1.22rem;
+         min-height: 180px;
+         margin-bottom: 12px;
+         border: 1.5px solid #a5b4fc;
+         transition: box-shadow 0.2s, background 0.2s, border 0.2s;
+         }
+         #translatorApp textarea.form-control:focus {
+         box-shadow: 0 0 0 3px #818cf8;
+         border-color: #6366f1;
+         }
+         #translatorApp .btn {
+         font-weight: 700;
+         background: linear-gradient(90deg, #6366f1 0%, #a5b4fc 100%);
+         color: #fff;
+         border: none;
+         box-shadow: 0 2px 12px rgba(99,102,241,0.10);
+         border-radius: 16px;
+         transition: background 0.2s, box-shadow 0.2s;
+         }
+         #translatorApp .btn:hover, #translatorApp .btn:focus {
+         background: linear-gradient(90deg, #818cf8 0%, #f472b6 100%);
+         color: #fff;
+         box-shadow: 0 6px 24px rgba(99,102,241,0.18);
+         }
+         #translatorApp select.form-control {
+         background: #f4f7ff;
+         border-radius: 12px;
+         border: 1.5px solid #a5b4fc;
+         color: #3730a3;
+         font-size: 1.12rem;
+         margin-bottom: 18px;
+         transition: background 0.2s, border 0.2s;
+         }
+         #translatorApp label[for="langFrom"], #translatorApp
+         label[for="langTo"] {
+         color: #6366f1;
+         font-weight: 700;
+         font-size: 1.13rem;
+         margin-bottom: 8px;
+         letter-spacing: 0.5px;
+         }
+         #translatorApp .input-group-append .btn {
+         background: linear-gradient(90deg, #f472b6 0%, #6366f1 100%);
+         color: #fff;
+         border-radius: 50%;
+         width: 56px;
+         height: 56px;
+         display: flex;
+         align-items: center;
+         justify-content: center;
+         font-size: 2.2rem;
+         box-shadow: 0 2px 12px rgba(99,102,241,0.10);
+         transition: background 0.2s;
+         }
+         #translatorApp .input-group-append .btn:hover {
+         background: linear-gradient(90deg, #f9a8d4 0%, #818cf8 100%);
+         }
+         #toggleSidebarBtn {
+         position: fixed;
+         left: -60px;
+         top: 24px;
+         z-index: 2000;
+         border-radius: 50%;
+         width: 44px;
+         height: 44px;
+         display: flex;
+         align-items: center;
+         justify-content: center;
+         font-size: 1.3rem;
+         box-shadow: 0 2px 8px rgba(44,62,80,0.10);
+         background: linear-gradient(135deg, #e0e7ff 0%, #c7d2fe 100%);
+         border: 2px solid #6366f1;
+         color: #6366f1;
+         transition: left 0.3s ease, background 0.2s, color 0.2s, border 0.2s, box-shadow 0.2s;
+         }
+         body:hover #toggleSidebarBtn {
+         left: 12px;
+         }
+         #toggleSidebarBtn:hover {
+         background: linear-gradient(90deg, #6366f1 0%, #818cf8 100%);
+         color: #fff;
+         border: 2px solid #818cf8;
+         box-shadow: 0 4px 12px rgba(99,102,241,0.3);
+         }
+         @media (max-width: 900px) {
+         #main-flex-container {
+         flex-direction: column;
+         height: auto;
+         min-height: 100vh;
+         }
+         #sidebar-history {
+         width: 100vw;
+         max-width: 100vw;
+         min-width: unset;
+         height: auto;
+         border-radius: 0 0 32px 32px;
+         position: static;
+         }
+         #translatorApp {
+         max-width: 100vw !important;
+         width: 100vw !important;
+         border-radius: 0 0 36px 36px;
+         min-width: 0 !important;
+         height: auto !important;
+         }
+         }
+         @media (max-width: 700px) {
+         #main-flex-container {
+         flex-direction: column;
+         }
+         #sidebar-history, #translatorApp {
+         max-width: 100% !important;
+         min-width: unset !important;
+         border-radius: 0 !important;
+         }
+         }
+         /* #translatorApp {
+         padding-left: 64px;
+         padding-right: 48px;
+         } */
+         @media (max-width: 900px) {
+         #translatorApp {
+         padding-left: 18px;
+         padding-right: 18px;
+         }
+         }
+         /* Input/Output text color improvements */
+         #translatorApp textarea.form-control,
+         #translatorApp .form-control {
+         color: #2d3a8c !important;
+         background: rgba(255,255,255,0.98) !important;
+         font-weight: 600;
+         letter-spacing: 0.02em;
+         }
+         #translatorApp textarea.form-control:focus,
+         #translatorApp .form-control:focus {
+         color: #4f46e5 !important;
+         background: #f0f4ff !important;
+         }
+         /* Make placeholder text more vibrant */
+         #translatorApp textarea.form-control::placeholder {
+         color: #818cf8 !important;
+         font-weight: 500;
+         opacity: 1;
+         }
+         /* Make label text more beautiful */
+         #translatorApp label[for="langFrom"],
+         #translatorApp label[for="langTo"] {
+         color: #f472b6 !important;
+         font-weight: 800;
+         font-size: 1.18rem;
+         letter-spacing: 0.5px;
+         }
+         /* Make h3 headings more colorful */
+         #translatorApp h3 {
+         color: #6366f1;
+         font-weight: 800;
+         letter-spacing: 0.5px;
+         text-shadow: 0 2px 8px #c7d2fe;
+         }
+         /* Make output text area more visually distinct */
+         #outputText {
+         background: linear-gradient(90deg, #f0f4ff 0%, #e0e7ff
+         100%) !important;
+         color: #059669 !important;
+         font-size: 1.22rem;
+         font-weight: 700;
+         border: 2px solid #6366f1 !important;
+         box-shadow: 0 2px 16px rgba(99,102,241,0.10);
+         }
+         /* Make input text area more visually distinct */
+         #inputText {
+         background: linear-gradient(90deg, #fff1f2 0%, #e0e7ff
+         100%) !important;
+         color: #d97706 !important;
+         font-size: 1.18rem;
+         font-weight: 700;
+         border: 2px solid #f472b6 !important;
+         box-shadow: 0 2px 16px rgba(236,72,153,0.10);
+         /* }
+         Improve the input (voice) button and icon
+         #voiceInputBtn {
+         background: linear-gradient(135deg, #f472b6 0%, #6366f1
+         100%) !important;
+         color: #fff !important;
+         border: none !important;
+         box-shadow: 0 2px 12px rgba(236,72,153,0.18), 0 1.5px 8px
+         0 rgba(99,102,241,0.10);
+         border-radius: 50%; */
+         /* width: 44px;
+         height: 44px;
+         display: flex;
+         align-items: center;
+         justify-content: center;
+         font-size: 1.7rem;
+         transition: background 0.2s, box-shadow 0.2s, transform 0.15s;
+         position: relative;
+         outline: none;
+         }
+         #voiceInputBtn:hover, #voiceInputBtn:focus {
+         background: linear-gradient(135deg, #6366f1 0%, #f472b6
+         100%) !important;
+         color: #fff !important;
+         box-shadow: 0 6px 24px rgba(99,102,241,0.18);
+         transform: scale(1.08);
+         } */
+         /* #voiceInputBtn svg {
+         filter: drop-shadow(0 2px 8px #f472b6);
+         transition: filter 0.2s;
+         }
+         #voiceInputBtn:hover svg, #voiceInputBtn:focus svg {
+         filter: drop-shadow(0 4px 16px #6366f1);
+         } */
+         /* Add a glowing ring effect on active */
+         /* #voiceInputBtn:active {
+         box-shadow: 0 0 0 6px #f472b6, 0 6px 24px rgba(99,102,241,0.18);
+         }
+         /* Remove rectangle box around mic icon */
+         /* .mic-input-group.input-group.mb-3 {
+         background: transparent !important;
+         border: none !important;
+         box-shadow: none !important;
+         padding: 0 !important;
+         margin: 0 !important; */
+         }
+         /* Align input/output action buttons in a single row, spaced
+         and responsive */
+         #translatorApp .d-flex.mb-2 {
+         display: flex;
+         flex-direction: row;
+         align-items: center;
+         gap: 12px;
+         width: 100%;
+         }
+         #translatorApp .d-flex.mb-2 > input[type="file"] {
+         flex: 1 1 40%;
+         min-width: 120px;
+         max-width: 220px;
+         }
+         #translatorApp .d-flex.mb-2 > button {
+         flex: 1 1 60%;
+         min-width: 120px;
+         max-width: 220px;
+         }
+         @media (max-width: 900px) {
+         #translatorApp .d-flex.mb-2 {
+         flex-direction: column;
+         gap: 8px;
+         }
+         #translatorApp .d-flex.mb-2 > input[type="file"],
+         #translatorApp .d-flex.mb-2 > button {
+         width: 100%;
+         max-width: 100%;
+         }
+         }
+         /* Make all main action buttons same width and centered */
+         #translatorApp .btn-block {
+         width: 100%;
+         margin-bottom: 10px;
+         }
+         #translatorApp .row.mt-4 .btn-block {
+         margin-bottom: 0;
+         }
+         /* Sidebar enlarge/collapse feature */
+         #sidebar-history.enlarged {
+         min-width: 340px !important;
+         max-width: 520px !important;
+         width: 32vw !important;
+         transition: width 0.3s, min-width 0.3s, max-width 0.3s;
+         }
+         #main-flex-container.sidebar-enlarged #translatorApp {
+         max-width: calc(100vw - 340px);
+         }
+         @media (max-width: 900px) {
+         #sidebar-history.enlarged {
+         width: 100vw !important;
+         min-width: unset !important;
+         max-width: unset !important;
+         }
+         }
+         /* Enlarge button style */
+         #enlargeSidebarBtn {
+         position: absolute;
+         top: 18px;
+         right: 18px;
+         z-index: 1100;
+         border-radius: 50%;
+         width: 38px;
+         height: 38px;
+         display: flex;
+         align-items: center;
+         justify-content: center;
+         font-size: 1.2rem;
+         background: linear-gradient(135deg, #e0e7ff 0%, #c7d2fe 100%);
+         border: 2px solid #6366f1;
+         color: #6366f1;
+         box-shadow: 0 2px 8px rgba(44,62,80,0.10);
+         transition: background 0.2s, color 0.2s, border 0.2s;
+         }
+         #enlargeSidebarBtn:hover {
+         background: linear-gradient(90deg, #6366f1 0%, #818cf8 100%);
+         color: #fff;
+         border: 2px solid #818cf8;
+         }
+         /* Floating mic button style */
+         .mic-btn-float {
+         position: absolute;
+         top: 12px;
+         right: 12px;
+         z-index: 10;
+         background: linear-gradient(135deg, #f472b6 0%, #6366f1
+         100%) !important;
+         color: #fff !important;
+         border: none !important;
+         box-shadow: 0 2px 12px rgba(236,72,153,0.18), 0 1.5px 8px
+         0 rgba(99,102,241,0.10);
+         border-radius: 50%;
+         width: 44px;
+         height: 44px;
+         display: flex;
+         align-items: center;
+         justify-content: center;
+         font-size: 1.7rem;
+         transition: background 0.2s, box-shadow 0.2s, transform 0.15s;
+         outline: none;
+         }
+         .mic-btn-float:hover, .mic-btn-float:focus {
+         background: linear-gradient(135deg, #6366f1 0%, #f472b6
+         100%) !important;
+         color: #fff !important;
+         box-shadow: 0 6px 24px rgba(99,102,241,0.18);
+         transform: scale(1.08);
+         }
+         /* Add/modify around line 1174 where language-container
+select is defined */
+      .language-container select, .language-select {
+         width: 100%;
+         padding: 10px 14px;
+         font-size: 1.1rem;
+         border-radius: 12px;
+         border: 1.5px solid #a5b4fc;
+         background-color: rgba(255,255,255,0.92);
+         color: #3730a3;
+         box-shadow: 0 2px 12px rgba(99,102,241,0.08);
+         transition: box-shadow 0.2s, background 0.2s, border 0.2s;
+         min-height: 50px; /* Increase height to fit content */
+         text-overflow: clip !important; /* Change from unset to clip */
+         white-space: normal !important;
+         overflow: visible !important;
+         word-wrap: break-word;
+         max-height: none !important; /* Prevent height restriction */
+      }
+
+      .language-container select option, .language-select option {
+         padding: 10px;
+         white-space: normal;
+         word-wrap: break-word;
+         font-size: 1.1rem;
+      }
+         .language-selection-bar {
+         display: flex;
+         align-items: center;
+         justify-content: space-between;
+         width: 100%;
+         max-width: 100%;
+         margin: 0 auto 24px auto;
+         padding: 12px 20px;
+         background: rgba(255,255,255,0.85);
+         border-radius: 16px;
+         box-shadow: 0 2px 16px rgba(99,102,241,0.10);
+         gap: 20px;
+         }
+         .language-container {
+         flex: 1;
+         max-width: 45%;
+         min-width: 180px;
+         display: flex;
+         flex-direction: column;
+         align-items: flex-start;
+         }
+         .language-container label {
+         font-weight: 700;
+         color: #f472b6 !important;
+         font-size: 1.15rem;
+         margin-bottom: 8px;
+         letter-spacing: 0.5px;
+         }
+         .language-container select:focus {
+         box-shadow: 0 0 0 3px #818cf8;
+         border-color: #6366f1;
+         outline: none;
+         }
+         .input-lang select {
+         border-left: 4px solid #f472b6;
+         }
+         .output-lang select {
+         border-right: 4px solid #6366f1;
+         }
+         .swap-button-container {
+         display: flex;
+         justify-content: center;
+         align-items: center;
+         padding: 0 20px;
+         margin-top: 24px;
+         }
+         .swap-button {
+         background: linear-gradient(135deg, #6366f1 0%, #f472b6 100%);
+         color: white;
+         border: none;
+         border-radius: 50%;
+         width: 48px;
+         height: 48px;
+         display: flex;
+         align-items: center;
+         justify-content: center;
+         font-size: 1.5rem;
+         cursor: pointer;
+         box-shadow: 0 4px 12px rgba(99,102,241,0.15);
+         transition: transform 0.3s, box-shadow 0.3s;
+         }
+         .swap-button:hover {
+         transform: scale(1.1) rotate(180deg);
+         box-shadow: 0 6px 16px rgba(99,102,241,0.25);
+         }
+         /* Make sure to remove the duplicate ID in the bottom row */
+         /*#swapBtn, #swapLangBtn {
+         transition: transform 0.3s, box-shadow 0.3s, background 0.3s;
+         }
+         /* #translatorApp {
+         background: linear-gradient(135deg, rgba(18, 18, 18, 0.9) 0%,
+rgba(30, 30, 30, 0.9) 100%) !important;
+         box-shadow: 0 0 20px rgba(0, 0, 0, 0.7) !important;
+         backdrop-filter: none !important;
+         border-radius: 12px !important;
+         border: none !important;
+         padding: 48px 32px 40px 32px !important;
+         margin-top: 0 !important;
+         max-width: 80vw !important;
+         min-width: 0 !important;
+         width: 80vw !important;
+         height: 100vh !important;
+         min-height: 100vh !important;
+         margin-left: 0 !important;
+         margin-right: 0 !important;
+         transition: box-shadow 0.3s, background 0.3s, border 0.3s !important;
+         display: flex !important;
+         flex-direction: column !important;
+         align-items: center !important;
+         float: left !important;
+         } */
+      </style>
+      <style>
+      html, body {
+          margin: 0 !important;
+          padding: 0 !important;
+          overflow-y: hidden !important;
+      }
+      #main-flex-container {
+          margin: 0 !important;
+          padding: 0 !important;
+      }
+      </style>
+   </head>
+   <body>
+      <!-- CSRF Token for form protection -->
+      <meta name="csrf-token" content="">
+      
+      <!-- Dark Mode Toggle Button (Visible everywhere) -->
+      <button id="darkModeToggle" class="btn btn-outline-dark splash-dark-toggle">
+          <span id="darkModeIcon">🌙</span>
+      </button>
+
+      <!-- Splash Screen -->
+      <div id="splashScreen">
+          <div class="splash-content">
+              <img src="https://cdn-icons-png.flaticon.com/512/2921/2921222.png" alt="App Icon" class="splash-icon">
+              <h1 class="splash-title">REAL-TIME MULTILINGUAL TRANSLATOR</h1>
+              
+              <!-- Features Carousel -->
+              <div class="features-carousel">
+                  <div class="feature-slide active">
+                      <i class="fas fa-language"></i>
+                      <h3>Multiple Languages</h3>
+                      <p>Translate between 40+ languages instantly with high accuracy</p>
+                  </div>
+                  <div class="feature-slide">
+                      <i class="fas fa-microphone"></i>
+                      <h3>Voice Input</h3>
+                      <p>Speak naturally and get instant translations with voice recognition</p>
+                  </div>
+                  <div class="feature-slide">
+                      <i class="fas fa-file-alt"></i>
+                      <h3>File Translation</h3>
+                      <p>Upload PDF or TXT files for quick document translation</p>
+                  </div>
+                  <div class="feature-slide">
+                      <i class="fas fa-history"></i>
+                      <h3>Translation History</h3>
+                      <p>Keep track of your translations and access them anytime</p>
+                  </div>
+              </div>
+
+              <!-- Quick Start Guide -->
+              <div class="quick-start-guide">
+                  <h3>Quick Start Guide</h3>
+                  <div class="steps-container">
+                      <div class="step">
+                          <div class="step-number">1</div>
+                          <p>Select your input and output languages</p>
+                      </div>
+                      <div class="step">
+                          <div class="step-number">2</div>
+                          <p>Type text, use voice input, or upload a file</p>
+                      </div>
+                      <div class="step">
+                          <div class="step-number">3</div>
+                          <p>Click translate and get instant results</p>
+                      </div>
+                  </div>
+              </div>
+
+              <button id="getStartedBtn" class="btn btn-light btn-lg">Get Started</button>
+              
+              <!-- Authentication Links on Splash Screen -->
+              <div style="margin-top: 30px; display: flex; gap: 15px; justify-content: center;">
+                  <a href="/login" class="btn btn-outline-light btn-md">Login</a>
+                  <a href="/register" class="btn btn-outline-light btn-md">Register</a>
+              </div>
+          </div>
+      </div>
+      <div id="createdBy">Created by Abhi Reddy</div>
+      
+      <!-- Authentication Navbar (Hidden until after splash) -->
+      <nav id="authNavbar" style="display:none; position: fixed; top: 0; right: 0; z-index: 1000; padding: 15px 30px; background: rgba(255,255,255,0.95); backdrop-filter: blur(10px); border-bottom: 2px solid #6366f1; width: 100%;">
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+              <div style="font-weight: 700; font-size: 1.3rem; color: #6366f1;">TRANSLATOR</div>
+              <div style="display: flex; gap: 15px; align-items: center;">
+                  <div id="tokenDisplay" style="display: flex; align-items: center; gap: 10px; padding: 8px 15px; background: linear-gradient(90deg, #e0e7ff 0%, #f0f4f8 100%); border-radius: 8px; border: 1px solid #c7d2fe;">
+                      <span style="color: #6366f1; font-weight: 600; font-size: 0.9rem;">Tokens: <span id="tokensRemaining">50</span>/<span id="tokensLimit">50</span></span>
+                      <div style="width: 80px; height: 6px; background: #d1d5f8; border-radius: 3px; overflow: hidden;">
+                          <div id="tokenProgressBar" style="width: 100%; height: 100%; background: linear-gradient(90deg, #6366f1 0%, #818cf8 100%); border-radius: 3px;"></div>
+                      </div>
+                  </div>
+                  <div style="display: flex; gap: 8px; align-items: center;">
+                      <span id="usernameDisplay" style="color: #2d3a8c; font-weight: 600;"></span>
+                      <span id="guestBadge" class="badge bg-warning" style="display:none; padding: 6px 12px; font-size: 0.8rem;">Guest (50/day)</span>
+                      <span id="registeredBadge" class="badge bg-success" style="display:none; padding: 6px 12px; font-size: 0.8rem;">Registered (500/day)</span>
+                  </div>
+                  <!-- Show logout button only if logged in -->
+                  {% if session.get('username') %}
+                  <a href="/logout" class="btn btn-sm btn-outline-danger">Logout</a>
+                  {% else %}
+                  <!-- Show login/register buttons for guest users -->
+                  <a href="/login" class="btn btn-sm btn-outline-primary">Login</a>
+                  <a href="/register" class="btn btn-sm btn-outline-success">Register</a>
+                  {% endif %}
+              </div>
+          </div>
+      </nav>
+      
+      <!-- Main Flex Container: Sidebar + Main App -->
+      <div id="main-flex-container" style="display:none; width:100vw;
+         height:100vh; flex-direction:row; margin-top: 60px;">
+      <!-- Sidebar History (ChatGPT style) -->
+      <div id="sidebar-history">
+        <h2>Translation History</h2>
+        <button id="downloadHistoryPdfBtn" class="btn btn-primary mb-3" style="
+           width: 100%;
+           padding: 30px;
+           font-weight: 600;
+           font-size: 1.1rem;
+           background: linear-gradient(90deg, #6366f1 0%, #818cf8 100%);
+           color: #fff;
+           border: none;
+           border-radius: 10px;
+           box-shadow: 0 2px 2px rgba(99,102,241,0.15);
+           margin: 10px 0;
+           transition: transform 0.2s, box-shadow 0.2s;
+        ">
+           Download History PDF
+        </button>
+         <ul id="translation-history-list" class="list-group mb-4">
+            {% if history and history|length > 0 %}
+            {% for entry in history %}
+            <li class="list-group-item">
+               <span style="font-weight:600;
+                  color:#6366f1;">{{
+               entry.source_lang_name|default(entry.source_lang)|upper }}</span>
+               <span style="font-size:1.1em;">→</span>
+               <span style="font-weight:600;
+                  color:#f472b6;">{{
+               entry.target_lang_name|default(entry.target_lang)|upper }}</span>
+               <br>
+               <span style="color:#3730a3;">{{
+               entry.source_text }}</span>
+               <span style="font-size:1.1em;">→</span>
+               <span style="color:#27ae60;">{{
+               entry.translated_text }}</span>
+               <br>
+               <span style="font-size:0.85em;
+                  color:#888;">{{ entry.timestamp }}</span>
+            </li>
+            {% endfor %}
+            {% else %}
+            <li class="list-group-item">No translation history
+               found.
+            </li>
+            {% endif %}
+         </ul>
+      </div>
+      <!-- Main Translator App -->
+      <div id="translatorApp" style="font-size:1.18rem; margin-top:
+60px; border: none !important; background: transparent !important;
+box-shadow: none !important;">
+         <h1 class="text-center" style="color: #1e2b6b; font-weight:
+900; letter-spacing: 1px; margin-bottom: 32px; margin-top: 20px;
+font-size:2.5rem; text-shadow: 0 2px 4px rgba(30,43,107,0.1);">Real
+Time Multilingual Translator</h1>
+
+         <!-- Main container -->
+         <div class="container p-3 container-after-title"
+style="background: rgba(236,239,255,0.55); border-radius: 12px;
+box-shadow: 0 2px 8px rgba(99,102,241,0.08); margin-bottom: 10px;
+margin-top: 20px;">
+             <!-- Text areas -->
+             <div class="row" style="width: 100%; margin-left: 2px;
+margin-bottom: 10px;">
+                 <div class="col-md-6">
+                     <h3 style="font-weight:600;">Input Box:</h3>
+                     <textarea id="inputText" class="form-control"
+rows="10" placeholder="Enter text here..."></textarea>
+ <div style="display: flex; align-items: center; margin-left: 20px;">
+                         <input type="checkbox" id="transliterateCheckbox" style="margin-right: 6px;">
+                         <label for="transliterateCheckbox" style="color: #231485; font-weight: 600; font-size: 1.rem; margin-bottom: 0; cursor: pointer;">
+                             Transliterate
+                         </label>
+                     </div>
+                 </div>
+                 <div class="col-md-6">
+                     <h3 style="font-weight:600;">Output Box:</h3>
+                     <textarea id="outputText" class="form-control
+mb-3" rows="10" readonly placeholder="Translated text will appear
+here..."></textarea>
+                 </div>
+             </div>
+
+             <!-- Language selection -->
+             <div class="container mt-4 p-3" style="background:
+rgba(236,239,255,0.55); border-radius: 12px; box-shadow: 0 2px 8px
+rgba(99,102,241,0.08); width: 100%; margin-bottom: 10px;">
+                 <div style="display: flex; justify-content:
+space-between; align-items: center; gap: 20px;">
+                     <!-- Left language section -->
+                     <div style="flex: 1; background: #232946;
+border-radius: 10px; padding: 12px 20px; display: flex; align-items:
+center;">
+                         <label for="langFrom" style="color: #f472b6;
+font-weight: 600; font-size: 1.15rem; margin-right: 15px; white-space:
+nowrap; margin-bottom: 0; line-height: 1;">Input Language:</label>
+                         <select id="langFrom" class="form-control"
+style="flex: 1; max-width: 160px; background: #fff; border: none;
+border-radius: 8px; color: #3730a3; font-size: 1.1rem; padding: 8px
+12px; height: 40px; margin: 0;">
+                             {% for language in languages %}
+                             <option {% if loop.index0 == 0
+%}selected{% endif %}>{{ language }}</option>
+                             {% endfor %}
+                         </select>
+                     </div>
+                    
+
+                     <!-- Swap icon container -->
+                     <div style="padding: 0 10px;">
+                         <svg id="swapLangBtn" width="36" height="36"
+viewBox="0 0 24 24" style="cursor: pointer;">
+                             <path d="M12 4V1L8 5l4 4V6c3.31 0 6 2.69
+6 6 0 1.01-.25 1.97-.7 2.8l1.46 1.46C19.54 15.03 20 13.57 20
+12c0-4.42-3.58-8-8-8zm0 14c-3.31 0-6-2.69-6-6
+0-1.01.25-1.97.7-2.8L5.24 7.74C4.46 8.97 4 10.43 4 12c0 4.42 3.58 8 8
+8v3l4-4-4-4v3z" fill="#6366f1" style="filter: drop-shadow(0 2px 4px
+rgba(99,102,241,0.3));"/>
+                         </svg>
+                     </div>
+
+                     <!-- Right language section -->
+                     <div style="flex: 1; background: #232946;
+border-radius: 10px; padding: 12px 20px; display: flex; align-items:
+center;">
+                         <label for="langTo" style="color: #f472b6;
+font-weight: 600; font-size: 1.15rem; margin-right: 15px; white-space:
+nowrap; margin-bottom: 0; line-height: 1;">Output Language:</label>
+                         <select id="langTo" class="form-control"
+style="flex: 1; max-width: 160px; background: #fff; border: none;
+border-radius: 10px; color: #3730a3; font-size: 1.1rem; padding: 8px
+12px; height: 40px; margin: 0;">
+                             {% for language in languages if language
+!= 'Auto-Detect' %}
+                             <option>{{ language }}</option>
+                             {% endfor %}
+                         </select>
+                     </div>
+                 </div>
+             </div>
+
+             <!-- Controls section -->
+             <!-- <div class="container mt-4 p-3" style="background:
+rgba(236,239,255,0.55); border-radius: 12px; box-shadow: 0 2px 8px
+rgba(99,102,241,0.08); width: 100%;"> -->
+                 <div class="row" style="width: 100%; margin-left:
+2px;margin-bottom: 10px;">
+                     <!-- Left side container -->
+                     <div class="col-md-6">
+                         <!-- First row: File input -->
+                         <div class="d-flex align-items-center mb-3
+custom-file-input-container">
+                             <label for="fileInput"
+class="custom-file-input-label mb-0">
+                                 <span style="margin-right: 8px;">📁</span>
+                                 <span class="choose-file-text">Choose
+File</span>
+                                 <span class="custom-file-name"
+id="fileName">No file chosen</span>
+                             </label>
+                             <input type="file" id="fileInput"
+accept=".pdf,.txt" style="display: none;">
+                             <button id="importFileBtn">
+                                 <span style="margin-right:
+4px;">📥</span>Import
+                             </button>
+                             <div id="fileTooltip" tabindex="1"
+title="Only PDF and TXT files are allowed.">?</div>
+                         </div>
+                         <!-- Second row: Voice input -->
+                         <div class="d-flex align-items-center"
+style="width: 100%;">
+                             <button id="voiceInputBtn" class="btn
+btn-secondary" style="width: 100%; background: linear-gradient(135deg,
+#f472b6 0%, #6366f1 100%); color: #fff; border: none; box-shadow: 0
+2px 12px rgba(236,72,153,0.18), 0 1.5px 8px 0 rgba(99,102,241,0.10);
+border-radius: 8px; padding: 10px 20px; display: flex; align-items:
+center; justify-content: center; font-size: 1.1rem;">
+                                 <span style="margin-right:
+8px;">🎤</span> Voice Input
+                             </button>
+                         </div>
+                     </div>
+                     <!-- Right side container -->
+                     <div class="col-md-6">
+                         <!-- First row: Download button -->
+                         <div class="d-flex align-items-center mb-3"
+style="width: 100%;">
+                             <div class="dropdown" style="width: 100%;">
+                                 <button class="btn btn-primary
+dropdown-toggle" type="button" id="downloadDropdown"
+data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"
+style="width: 100%; padding: 10px 20px; background:
+linear-gradient(90deg, #6366f1 0%, #818cf8 100%);">
+                                     Download Translated
+                                 </button>
+                                 <div class="dropdown-menu"
+aria-labelledby="downloadDropdown" style="width: 100%; background:
+rgba(255,255,255,0.95); border-radius: 8px; box-shadow: 0 4px 16px
+rgba(99,102,241,0.15);">
+                                     <button id="downloadTextBtn"
+class="dropdown-item" style="padding: 10px 16px; color: #4f46e5;
+font-weight: 600;">
+                                         <span style="margin-right:
+8px;">📄</span> Download as Text
+                                     </button>
+                                     <button id="downloadPdfBtn"
+class="dropdown-item" style="padding: 10px 16px; color: #4f46e5;
+font-weight: 600;">
+                                         <span style="margin-right:
+8px;">📑</span> Download as PDF
+                                     </button>
+                                 </div>
+                             </div>
+                         </div>
+                         <!-- Second row: Speak button -->
+                         <div class="d-flex align-items-center"
+style="width: 100%;">
+                             <button id="speakBtn" class="btn
+btn-success" style="width: 100%; padding: 10px 20px;">Speak Translated
+Text</button>
+                         </div>
+                     </div>
+                 </div>
+             <!-- </div> -->
+
+             <!-- Action buttons -->
+             <div class="button-row d-flex justify-content-center
+gap-2" style="width: 100%; margin-top: 16px; max-width: 100%;
+margin-left: auto; margin-right: auto;">
+                 <button id="translateBtn" class="btn btn-primary"
+style="flex: 1 1 0;">Translate</button>
+                 <button id="clearAllBtn" class="btn btn-warning"
+style="flex: 1 1 0;">Clear All</button>
+             </div>
+         </div>
+      </div>
+      <!-- Sidebar Toggle Button -->
+      <button id="toggleSidebarBtn" class="btn btn-secondary"
+          style="position: fixed; left: 10px; top: 6px; z-index: 2000;
+          border-radius: 50%; width: 44px; height: 44px; display: flex;
+          align-items: center; justify-content: center; font-size: 1.3rem;
+          box-shadow: 0 2px 8px rgba(44,62,80,0.10); background:
+          rgba(255,255,255,0.85);">
+      <span id="toggleSidebarIcon" aria-label="Toggle sidebar"
+          title="Toggle sidebar">«</span>
+      </button>
+  </div>
+  
+  <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" crossorigin="anonymous" />
+  <script src="/static/js/script.js"></script>
+  <script>
+     
+      // Features Carousel Animation
+      document.addEventListener('DOMContentLoaded', function() {
+          const features = document.querySelectorAll('.feature-slide');
+          let currentFeature = 0;
+          
+          function showNextFeature() {
+              features[currentFeature].style.opacity = '0';
+              setTimeout(() => {
+                  features[currentFeature].style.display = 'none';
+                  currentFeature = (currentFeature + 1) % features.length;
+                  features[currentFeature].style.display = 'block';
+                  setTimeout(() => {
+                      features[currentFeature].style.opacity = '1';
+                  }, 50);
+              }, 300);
+          }
+          
+          // Set initial states
+          features.forEach((feature, index) => {
+              feature.style.transition = 'opacity 0.3s ease';
+              if (index !== 0) {
+                  feature.style.display = 'none';
+                  feature.style.opacity = '0';
+              }
+          });
+          
+          // Start the carousel
+          setInterval(showNextFeature, 4000);
+      });
+
+      // Splash Screen Transition: show translator (no login required)
+      document.getElementById('getStartedBtn').addEventListener('click', function() {
+          const splash = document.getElementById('splashScreen');
+          const main = document.getElementById('main-flex-container');
+          const nav = document.getElementById('authNavbar');
+          if (splash) splash.style.display = 'none';
+          if (main) main.style.display = 'flex';
+          if (nav) nav.style.display = 'block';
+      });
+      // If user already logged in, show translator directly without splash
+      document.addEventListener('DOMContentLoaded', function() {
+          const loggedIn = "{{ 'true' if session.get('username') else 'false' }}";
+          if (loggedIn === 'true') {
+              const splash = document.getElementById('splashScreen');
+              const main = document.getElementById('main-flex-container');
+              const nav = document.getElementById('authNavbar');
+              if (splash) splash.style.display = 'none';
+              if (main) main.style.display = 'flex';
+              if (nav) nav.style.display = 'block';
+              const uname = "{{ session.get('username', '') }}";
+              if (uname && uname.trim() !== '') {
+                  const disp = document.getElementById('usernameDisplay');
+                  if (disp) { disp.textContent = 'Welcome, ' + uname; disp.style.display = 'inline'; }
+              }
+          }
+      });
+  </script>
+  <style>
+      body.dark-mode {
+      background: linear-gradient(135deg, #232946 0%, #16161a
+      100%) !important;
+      color: #eaeaea !important;
+      border-color: #35377a !important;
+      }
+      body.dark-mode #translatorApp {
+      background: linear-gradient(135deg, #232946 60%, #16161a
+      100%) !important;
+      box-shadow: 0 12px 40px 0 rgba(20,20,40,0.28), 0 1.5px 8px
+      0 rgba(99,102,241,0.12);
+      border: 2.5px solid #35377a;
+      }
+      body.dark-mode #translatorApp h1 {
+      color: #a5b4fc !important;
+      text-shadow: 0 2px 12px rgba(99, 102, 241, 0.5) !important;
+      background: linear-gradient(90deg, #818cf8 0%, #c7d2fe 100%) !important;
+      -webkit-background-clip: text !important;
+      -webkit-text-fill-color: transparent !important;
+      background-clip: text !important;
+      font-weight: 900 !important;
+      letter-spacing: 2px !important;
+      }
+      body.dark-mode #translation-history-container h2,
+      body.dark-mode label[for="langFrom"],
+      body.dark-mode label[for="langTo"] {
+      color: #eaeaea !important;
+      text-shadow: 0 2px 8px #232946;
+      }
+      body.dark-mode .form-control, body.dark-mode
+      textarea.form-control, body.dark-mode select.form-control {
+      background-color: rgba(30, 41, 59, 0.92) !important;
+      color: #eaeaea !important;
+      border: 1.5px solid #35377a !important;
+      }
+      body.dark-mode .form-control:focus {
+      box-shadow: 0 0 0 2.5px #6366f1;
+      border-color: #6366f1;
+      }
+      body.dark-mode .form-control::placeholder {
+      color: #b6b6b6;
+      }
+      body.dark-mode .btn, body.dark-mode .btn-block, body.dark-mode
+      .btn-info, body.dark-mode .btn-warning, body.dark-mode .btn-danger,
+      body.dark-mode .btn-success, body.dark-mode .btn-secondary,
+      body.dark-mode .btn-primary {
+      background: linear-gradient(90deg, #232946 0%, #6366f1
+      100%) !important;
+      color: #fff !important;
+      border: none !important;
+      }
+      body.dark-mode .btn:hover, body.dark-mode .btn:focus {
+      background: linear-gradient(90deg, #6366f1 0%, #232946
+      100%) !important;
+      color: #fff !important;
+      }
+      body.dark-mode .input-group-append .btn {
+      background: linear-gradient(90deg, #f472b6 0%, #232946
+      100%) !important;
+      }
+      body.dark-mode .input-group-append .btn:hover {
+      background: linear-gradient(90deg, #f9a8d4 0%, #6366f1
+      100%) !important;
+      }
+      body.dark-mode #translation-history-container {
+      background: rgba(30,41,59,0.85) !important;
+      color: #eaeaea !important;
+      }
+      body.dark-mode #translation-history-list .list-group-item {
+      background: rgba(44, 62, 80, 0.7) !important;
+      color: #eaeaea !important;
+      }
+      body.dark-mode #createdBy {
+      background: rgba(44,62,80,0.85) !important;
+      color: #eaeaea !important;
+      border: 1.5px solid #6366f1 !important;
+      }
+      body.dark-mode #createdBy:hover {
+      background: #6366f1 !important;
+      color: #fff !important;
+      }
+      body.dark-mode .card {
+      background: rgba(44,62,80,0.92) !important;
+      }
+      body.dark-mode .d-flex.align-items-center.mb-3, body.dark-mode
+      .d-flex.align-items-center {
+      background: #232946 !important;
+      }
+      body.dark-mode .file-input-large {
+      background: #232946 !important;
+      color: #eaeaea !important;
+      border: 1.5px solid #35377a !important;
+      }
+      body.dark-mode #darkModeToggle {
+      background: rgba(44,62,80,0.92) !important;
+      color: #fff !important;
+      border: 1.5px solid #6366f1 !important;
+      }
+      body.dark-mode #darkModeToggle:hover {
+      background: #6366f1 !important;
+      color: #fff !important;
+      }
+      /* Flexbox styling for label and select */
+      .language-selection {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 20px;
+      }
+      .language-selection label {
+      font-weight: bold;
+      color: #4f46e5;
+      margin-right: 10px;
+      }
+      .language-selection select {
+      width: 100%;
+      max-width: 200px; /* Adjust width to fit next to label */
+      padding: 8px 8px;
+      font-size: 1rem;
+      border-radius: 10px;
+      border: 1.5px solid #a5b4fc;
+      background-color: rgba(255,255,255,0.85);
+      color: #3730a3;
+      box-shadow: 0 2px 16px rgba(99,102,241,0.08);
+      transition: box-shadow 0.2s, background 0.2s, color 0.2s, border 0.2s;
+      }
+      .language-selection select:focus {
+      box-shadow: 0 0 0 3px #818cf8;
+      border-color: #6366f1;
+      }
+      #inputText {
+      width: 100%;
+      border-radius: 10px;
+      padding: 10px;
+      font-size: 1rem;
+      border: 1.5px solid #a5b4fc;
+      background-color: rgba(255,255,255,0.85);
+      color: #3730a3;
+      box-shadow: 0 2px 16px rgba(99,102,241,0.08);
+      transition: box-shadow 0.2s, background 0.2s, color 0.2s, border 0.2s;
+      }
+      #inputText:focus,
+      .language-selection select:focus {
+      box-shadow: 0 0 0 3px #818cf8;
+      border-color: #6366f1;
+      }
+      #swapBtn {
+      margin: 0 10px; /* Add some space around the button */
+      }
+      .input-output-container {
+      margin-bottom: 20px;
+      }
+  </style>
+  <style>
+      @media (max-width: 1100px) {
+      #main-flex-container { flex-direction: column; gap: 0; }
+      #sidebar-history { max-width: 100%; min-width: unset;
+      margin-bottom: 24px; }
+      }
+      @media (max-width: 700px) {
+      #main-flex-container { flex-direction: column; }
+      #sidebar-history, #translatorApp { max-width: 100%
+      !important; min-width: unset !important; }
+      }
+  </style>
+  <style>
+      #translatorApp.sidebar-closed {
+          width: 100vw !important;
+          max-width: 100vw !important;
+          margin-left: 0 !important;
+          margin-right: 0 !important;
+          border-radius: 0 !important;
+          float: none !important;
+
+      }
+  </style>
+  <script>
+  // Floating buttons animation on mouse move
+  document.addEventListener('mousemove', function() {
+    const darkModeBtn = document.getElementById('darkModeToggle');
+    const toggleSidebarBtn = document.getElementById('toggleSidebarBtn');
+    const sidebar = document.getElementById('sidebar-history');
+    
+    if (darkModeBtn) {
+      darkModeBtn.style.right = '24px';
+    }
+    if (toggleSidebarBtn) {
+      toggleSidebarBtn.style.left = '12px';
+    }
+  });
+
+  // Hide buttons when mouse leaves the window
+  document.addEventListener('mouseleave', function() {
+    const darkModeBtn = document.getElementById('darkModeToggle');
+    const toggleSidebarBtn = document.getElementById('toggleSidebarBtn');
+    
+    if (darkModeBtn) {
+      darkModeBtn.style.right = '-70px';
+    }
+    if (toggleSidebarBtn) {
+      toggleSidebarBtn.style.left = '-60px';
+    }
+  });
+
+  // Sidebar hover behavior
+  const sidebar = document.getElementById('sidebar-history');
+  if (sidebar) {
+    sidebar.addEventListener('mouseenter', function() {
+      sidebar.style.left = '0';
+    });
+    sidebar.addEventListener('mouseleave', function() {
+      sidebar.style.left = '-280px';
+    });
+  }
+</script>
+</body>
+</html>
