@@ -6,7 +6,7 @@ fpdf2==2.5.5
 pymongo==4.6.0
 deep-translator==1.8.1
 SpeechRecognition>=3.10.0
-indic-transliteration==1.1.0
+indic-transliteration==2.3.57
 PyPDF2==1.26.0
 python-dotenv==1.0.0
 gunicorn==22.0.0
