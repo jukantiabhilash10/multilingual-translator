@@ -855,8 +855,13 @@ gtts_lang_map = {
 }
 
 @app.route('/')
-def home():
-    return jsonify({"status": "API running"})
+def index():
+    user_history = get_history_for_user(session['user_id'])
+    return render_template(
+        'index.html',
+        languages=languages,
+        history=user_history
+    )
 
 @app.route('/get_csrf_token', methods=['GET'])
 def get_csrf_token():
@@ -1337,5 +1342,6 @@ def speak():
         print(f"[DEBUG] Error in /speak: {str(e)}")
         return jsonify({'error': 'Speech generation failed', 'details': str(e)}), 500
 
-if __name__ == '__main__':
-    app.run()
+if __name__ == "__main__":
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host="0.0.0.0", port=port)
