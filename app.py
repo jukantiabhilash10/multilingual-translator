@@ -852,12 +852,8 @@ gtts_lang_map = {
 }
 
 @app.route('/')
-def index():
-    # Fetch translation history for current user only (DB or in-memory fallback)
-    history = get_history_for_user(session['user_id'])
-    # Add a cache-busting timestamp
-    cache_v = int(time.time())
-    return render_template('index.html', languages=languages, history=history, cache_v=cache_v)
+def home():
+    return jsonify({"status": "API running"})
 
 @app.route('/get_csrf_token', methods=['GET'])
 def get_csrf_token():
