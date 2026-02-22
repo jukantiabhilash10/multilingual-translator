@@ -1,19 +1,36 @@
-# Your original index.html is in templates/index.html
-# For Netlify static hosting, we show a simple landing page
-# The full app requires the Flask backend
-
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Multilingual Translator</title>
-    <script>
-        // Redirect to Flask backend
-        window.location.href = 'https://translator-api-0th4.onrender.com/';
-    </script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
 </head>
 <body>
-    <p>Loading translator app... If not redirected, <a href="https://translator-api-0th4.onrender.com/">click here</a></p>
+    <div class="container">
+        <h1>Multilingual Translator</h1>
+        <div class="translation-section">
+            <textarea id="text-to-translate" placeholder="Enter text to translate..."></textarea>
+            <div class="language-selection">
+                <select id="lang-from">
+                    <option value="English">English</option>
+                    <!-- Add more language options here -->
+                </select>
+                <select id="lang-to">
+                    <option value="Telugu">Telugu</option>
+                    <!-- Add more language options here -->
+                </select>
+            </div>
+            <button id="translate-btn">Translate</button>
+            <div id="translated-text"></div>
+        </div>
+        <div class="history-section">
+            <h2>Translation History</h2>
+            <ul id="history-list"></ul>
+            <button id="download-history-btn">Download History</button>
+        </div>
+    </div>
 </body>
 </html>
